@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "undefined/subscriptions/a9c0ffea-9fdd-42a0-bb0c-0ca3668d2f9c/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/sopbackendtest",
+  "appService.deploySubpath": "."
+}
