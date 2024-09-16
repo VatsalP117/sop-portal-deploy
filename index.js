@@ -82,7 +82,12 @@ app.use("/api/student", studentMiddleware, studentRouter);
 
 app.use("/api/faculty", facultyMiddleware, facultyRouter);
 app.get("/api/hello", async (req, res) => {
-  const entries = await ProjectStudent.findAll();
+  //only fetch entries that are accepted
+  const entries = await ProjectStudent.findAll({
+    where: {
+      status: "Accepted",
+    },
+  });
   let csvContent = "data:text/csv;charset=utf-8,";
   const columns = [
     "project_id",
@@ -97,9 +102,7 @@ app.get("/api/hello", async (req, res) => {
     const student = await User.findByPk(entries[i].users_id);
     const project = await Project.findByPk(entries[i].project_id);
     const faculty = await User.findByPk(project.facultyId);
-    console.log(student, faculty, project);
     if (entries[i].status == "Accepted") {
-      console.log(entries[i].status);
       let rowArr = [
         project.project_id,
         project.title,
@@ -108,12 +111,10 @@ app.get("/api/hello", async (req, res) => {
         student.users_name,
         entries[i].category,
       ];
-      console.log(rowArr);
       let row = rowArr.join(",");
       csvContent += row + "\r\n";
     }
   }
-  console.log(csvContent);
   res.send(csvContent);
 });
 const PORT = process.env.PORT || 5000;
