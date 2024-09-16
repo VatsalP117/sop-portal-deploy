@@ -38,11 +38,11 @@ const getProjects = async (req, res) => {
       include: [
         {
           model: Project,
-          as: "projects", // Changed from "facultyProjects" to "projects"
+          as: "projects",
         },
       ],
     });
-    if (!user || !user.users_type.match(/Professor/i)) {
+    if (!user || user.users_type !== "Faculty") {
       return res.status(404).json({ message: "Faculty not found" });
     }
     const new_projects = user.projects.map((project) => ({
@@ -108,7 +108,7 @@ const createProject = async (req, res) => {
     } = req.body;
     const faculty = await User.findByPk(req.user.id);
 
-    if (!faculty || !faculty.users_type.match(/Professor/i)) {
+    if (!faculty || faculty.users_type !== "Faculty") {
       return res.status(404).send("Faculty not found");
     }
     const new_project = await Project.create({

@@ -16,7 +16,7 @@ passport.use(
         });
 
         if (user) {
-          let t = user.users_type.match(/student/i) ? "student" : "faculty";
+          let t = user.users_type == "Faculty" ? "faculty" : "student";
           profile.type = t;
           profile.id = user.users_id;
           return done(null, profile);
