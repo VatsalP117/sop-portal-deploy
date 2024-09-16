@@ -20,7 +20,7 @@ function sendMail(to, project_code, project_title) {
     from: "csistest0@gmail.com",
     to: to,
     subject: "Your project has a new application",
-    text: `Your project ${project_title} (${project_code}) has a new application. Please review it.`,
+    text: `Your project ${project_title} has a new application. Please review it.`,
   };
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
@@ -62,7 +62,7 @@ const getAllProjects = async (req, res) => {
         id: project.project_id,
         project_name: project.title,
         status: project.status,
-        tags: project.tags.split(","),
+        tags: project.tags.split("_"),
         professor: project.faculty.users_name,
       };
     });
@@ -87,7 +87,7 @@ const getProjectDescription = async (req, res) => {
       id: project.project_id,
       project_title: project.title,
       status: project.status,
-      tags: project.tags.split(","),
+      tags: project.tags.split("_"),
       //professor: project.faculty.name,
       date: project.date,
       description: JSON.parse(project.description),
@@ -96,7 +96,6 @@ const getProjectDescription = async (req, res) => {
       maxStudents: project.maxStudents,
     });
   } catch (error) {
-    console.log("gaya hi nahi projectdescription");
     console.log(error);
     return res.status(500).json({ message: error.message });
   }
@@ -120,7 +119,9 @@ const applyForProject = async (req, res) => {
     if (!student) {
       return res.status(404).send("student not found");
     }
-
+    if (project.status !== "Open") {
+      return res.status(400).send("Project is not open");
+    }
     const applied = await ProjectStudent.findOne({
       where: {
         project_id: id,
@@ -148,25 +149,6 @@ const applyForProject = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
-// const uploadStudentDetails = async (req, res) => {
-//   try {
-//     const student = await Student.findByPk(req.user.id);
-//     if (!student) {
-//       return res.status(404).json({ message: "Student not found" });
-//     }
-//     await student.update({
-//       cgpa: req.body.cgpa,
-//       resume: req.body.resume,
-//     });
-//     return res
-//       .status(200)
-//       .json({ message: "Student details updated successfully" });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({ message: error.message });
-//   }
-// };
 
 const getStudentProjects = async (req, res) => {
   try {

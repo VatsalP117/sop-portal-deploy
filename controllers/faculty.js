@@ -22,7 +22,7 @@ function sendMail(to, text, project_code, project_title) {
     from: "csistest0@gmail.com",
     to: to,
     subject: "Your project application has been reviewed.",
-    text: `Regarding your application for project ${project_title} (${project_code}).${text}`,
+    text: `Regarding your application for project ${project_title}.${text}`,
   };
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
@@ -49,7 +49,7 @@ const getProjects = async (req, res) => {
       id: project.project_id,
       project_name: project.title,
       status: project.status,
-      tags: project.tags.split(","),
+      tags: project.tags.split("_"),
       professor: user.users_name,
     }));
     return res.status(200).json(new_projects);
@@ -80,7 +80,7 @@ const getProjectDescription = async (req, res) => {
       id: project.project_id,
       project_title: project.title,
       status: project.status,
-      tags: project.tags.split(","),
+      tags: project.tags.split("_"),
       professor: project.faculty.users_name,
       date: project.date,
       description: JSON.parse(project.description),
@@ -115,7 +115,7 @@ const createProject = async (req, res) => {
       title: project_title,
       description: JSON.stringify(description),
       facultyId: faculty.users_id,
-      tags: tags.join(","),
+      tags: tags.join("_"),
       date,
       status,
       gpsrn,
@@ -149,7 +149,7 @@ const editProject = async (req, res) => {
     await project.update({
       title: project_title,
       description: JSON.stringify(description),
-      tags: tags.join(","),
+      tags: tags.join("_"),
       date,
       status,
       gpsrn,
@@ -172,9 +172,10 @@ const getProjectApplicants = async (req, res) => {
           model: User,
           as: "students",
           through: { attributes: ["status"] },
-          //where clause with multiple conditions user_type can be fdstudent or hdstudent or phdstudent
           where: {
-            users_type: { [Op.or]: ["fdstudent", "hdstudent", "phdstudent"] },
+            users_type: {
+              [Op.or]: ["fdstudent", "hdstudent", "phdstudent", "student"],
+            },
           },
         },
       ],
