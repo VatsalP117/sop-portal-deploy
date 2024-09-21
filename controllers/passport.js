@@ -19,6 +19,9 @@ passport.use(
           let t = user.users_type == "Faculty" ? "faculty" : "student";
           profile.type = t;
           profile.id = user.users_id;
+          if (user.users_type === "Admin") {
+            profile.type = "admin";
+          }
           return done(null, profile);
         }
 

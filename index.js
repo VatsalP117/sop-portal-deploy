@@ -75,7 +75,9 @@ app.get("/student-project", (req, res) => {
 app.get("/csv", (req, res) => {
   res.sendFile(__dirname + "/public/csv.html");
 });
-
+app.get("/admin", (req, res) => {
+  res.sendFile(__dirname + "/public/admin.html");
+});
 app.use("/api/auth", AuthRouter);
 
 app.use("/api/student", studentMiddleware, studentRouter);
