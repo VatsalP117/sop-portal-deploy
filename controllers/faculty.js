@@ -222,10 +222,20 @@ const acceptStudent = async (req, res) => {
         users_id: studentid,
       },
     });
+    if (project.status != "Open") {
+      return res.status(404).send("Project is not open");
+    }
     if (!projectStudent) {
       return res.status(404).send("Project-student association not found");
     }
     await projectStudent.update({ status: "Accepted" });
+    //update project.num_applied to increment by 1 and save
+    project.num_applied = project.num_applied + 1;
+    await project.save();
+    if (project.num_applied == project.maxStudents) {
+      project.status = "Closed";
+      await project.save();
+    }
     sendMail(
       student.users_email_id,
       acceptance_text,

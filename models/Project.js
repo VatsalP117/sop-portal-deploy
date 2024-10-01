@@ -35,6 +35,10 @@ class Project extends Model {
         maxStudents: {
           type: DataTypes.INTEGER,
         },
+        num_applied: {
+          type: DataTypes.INTEGER,
+          defaultValue: 0,
+        },
         facultyId: {
           type: DataTypes.STRING,
           allowNull: false,

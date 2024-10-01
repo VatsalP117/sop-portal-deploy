@@ -128,9 +128,9 @@ const applyForProject = async (req, res) => {
         users_id: student.users_id,
       },
     });
-    console.log("applied", applied);
+    //console.log("applied", applied);
     if (applied) {
-      return res.status(400).send("Student already applied for this project");
+      return res.status(500).send("Student already applied for this project");
     }
 
     await ProjectStudent.create({
