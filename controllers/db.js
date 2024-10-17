@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+
 const { Sequelize } = require("sequelize");
 const Faculty = require("../models/Faculty");
 const Project = require("../models/Project");

@@ -14,7 +14,6 @@ const {
 } = require("./controllers/middleware");
 const session = require("express-session");
 const passport = require("passport");
-
 const cors = require("cors");
 
 const app = express();
@@ -45,50 +44,101 @@ app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/student", (req, res) => {
+// Define the base path for all routes
+app.use("/projectalloc", (req, res, next) => {
+  console.log(req.path);
+  next();
+});
+
+// Now, all paths are under the /projectalloc base path
+app.get("/projectalloc/student", (req, res) => {
   res.sendFile(__dirname + "/public/student.html");
 });
 
-app.get("/faculty", (req, res) => {
+app.get("/projectalloc/faculty", (req, res) => {
   res.sendFile(__dirname + "/public/faculty.html");
 });
 
-app.get("/applications", (req, res) => {
+app.get("/projectalloc/applications", (req, res) => {
   res.sendFile(__dirname + "/public/applications.html");
 });
 
-app.get("/login", (req, res) => {
+app.get("/projectalloc/login", (req, res) => {
   res.sendFile(__dirname + "/public/login.html");
 });
 
-app.get("/404", (req, res) => {
+app.get("/projectalloc/404", (req, res) => {
   res.sendFile(__dirname + "/public/404.html");
 });
 
-app.get("/project", (req, res) => {
+app.get("/projectalloc/project", (req, res) => {
+  console.log("requested project");
   res.sendFile(__dirname + "/public/project.html");
 });
 
-app.get("/student-project", (req, res) => {
+app.get("/projectalloc/student-project", (req, res) => {
   res.sendFile(__dirname + "/public/student-project.html");
 });
-app.get("/csv", (req, res) => {
+
+app.get("/projectalloc/csv", (req, res) => {
   res.sendFile(__dirname + "/public/csv.html");
 });
-app.get("/admin", (req, res) => {
+
+app.get("/projectalloc/admin", (req, res) => {
   res.sendFile(__dirname + "/public/admin.html");
 });
-app.use("/api/auth", AuthRouter);
+app.use("/api/auth/*", (req, res, next) => {
+  const newPath = req.originalUrl.replace(
+    "/api/auth",
+    "/projectalloc/api/auth"
+  );
+  res.redirect(newPath);
+});
+app.use("/api/student/*", (req, res, next) => {
+  const newPath = req.originalUrl.replace(
+    "/api/student",
+    "/projectalloc/api/student"
+  );
+  res.redirect(newPath);
+});
+app.use("/api/faculty/*", (req, res, next) => {
+  const newPath = req.originalUrl.replace(
+    "/api/faculty",
+    "/projectalloc/api/faculty"
+  );
+  res.redirect(newPath);
+});
+app.use("/student", (req, res, next) => {
+  const newPath = req.originalUrl.replace("/student", "/projectalloc/student");
+  res.redirect(newPath);
+});
+app.use("/faculty", (req, res, next) => {
+  const newPath = req.originalUrl.replace("/faculty", "/projectalloc/faculty");
+  res.redirect(newPath);
+});
+// app.use("/project", (req, res, next) => {
+//   const newPath = req.originalUrl.replace("/project", "/projectalloc/project");
+//   res.redirect(newPath);
+// });
+app.use((req, res, next) => {
+  // Check if the request path matches "/project" and contains a query parameter "projectId"
+  console.log(req.path);
+  next();
+});
+app.use("/student-project", (req, res, next) => {
+  const newPath = req.originalUrl.replace(
+    "/student-project",
+    "/projectalloc/student-project"
+  );
+  res.redirect(newPath);
+});
+app.use("/projectalloc/api/auth", AuthRouter);
+app.use("/projectalloc/api/student", studentMiddleware, studentRouter);
+app.use("/projectalloc/api/faculty", facultyMiddleware, facultyRouter);
 
-app.use("/api/student", studentMiddleware, studentRouter);
-
-app.use("/api/faculty", facultyMiddleware, facultyRouter);
-app.get("/api/hello", async (req, res) => {
-  //only fetch entries that are accepted
+app.get("/projectalloc/api/hello", async (req, res) => {
   const entries = await ProjectStudent.findAll({
-    where: {
-      status: "Accepted",
-    },
+    where: { status: "Accepted" },
   });
   let csvContent = "data:text/csv;charset=utf-8,";
   const columns = [
@@ -119,8 +169,8 @@ app.get("/api/hello", async (req, res) => {
   }
   res.send(csvContent);
 });
-const PORT = process.env.PORT || 5000;
 
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);
 });
